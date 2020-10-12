@@ -1,0 +1,43 @@
+{
+  "name": "@proyecto-didi/didi-ssi-logger",
+  "version": "0.0.1",
+  "description": "DIDI SSI Logger",
+  "main": "dist/index.js",
+  "scripts": {
+    "test": "mocha -r ts-node/register/transpile-only -r source-map-support/register tests/**/*.test.ts",
+    "build": "tsc",
+    "prepare": "npm run build",
+    "prepublish": "tsc",
+    "coverage": "nyc -r text -e .ts -x \"*.test.ts\" npm run test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ong-bitcoin-argentina/DIDI-SSI-Logger.git"
+  },
+  "author": "Matías Oveja Smith <matias.ovejassmith@gmail.com>",
+  "license": "SEE LICENSE IN LICENSE",
+  "bugs": {
+    "url": "https://github.com/ong-bitcoin-argentina/DIDI-SSI-Logger/issues"
+  },
+  "homepage": "https://github.com/ong-bitcoin-argentina/DIDI-SSI-Logger#readme",
+  "types": "dist/index.d.ts",
+  "files": [
+    "dist"
+  ],
+  "dependencies": {
+    "applicationinsights": "^2.0.0-beta.201004.0"
+  },
+  "devDependencies": {
+    "@istanbuljs/nyc-config-typescript": "^1.0.1",
+    "@types/chai": "^4.2.12",
+    "@types/mocha": "^8.0.3",
+    "@types/sinon": "^9.0.8",
+    "chai": "^4.2.0",
+    "mocha": "^8.1.3",
+    "nyc": "^15.1.0",
+    "sinon": "^9.1.0",
+    "source-map-support": "^0.5.19",
+    "ts-node": "^9.0.0",
+    "typescript": "^4.0.3"
+  }
+}
