@@ -1,6 +1,6 @@
 {
   "name": "@proyecto-didi/didi-ssi-logger",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "DIDI SSI Logger",
   "main": "dist/index.js",
   "scripts": {
