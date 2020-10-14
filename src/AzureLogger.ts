@@ -20,8 +20,9 @@ export class AzureLogger extends Logger {
 
   constructor(config : AzureConfiguration) {
     super();
-    if(config.disableAppInsights) return;
-    
+    if(config.disableAppInsights) {
+      return;
+    }
     this.options = config;
     this.config();
   }
@@ -52,20 +53,25 @@ export class AzureLogger extends Logger {
   }
 
   public async track(trackProperties: AzureTrackProperties): Promise<void> {
-    if ( !this.logger || !this.options ||this.options.disableAppInsights || !trackProperties) return;
-
+    if ( !this.logger || !this.options || this.options.disableAppInsights || !trackProperties) {
+      return;
+    }
     const { name, method, properties } = trackProperties;
     this.logger.defaultClient[method]({ name, properties });
     
   }
 
   isDisabled() {
-    if (!this.options) return false;
+    if (!this.options) {
+      return false;
+    }
     return this.options.disableAppInsights;
   }
 
   dispose() {
-    if (!this.logger) return;
+    if (!this.logger) {
+      return;
+    }
     if (this.logger.defaultClient) this.logger.defaultClient.flush();
       
     this.logger.dispose();
