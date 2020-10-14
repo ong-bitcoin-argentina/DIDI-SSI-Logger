@@ -1,6 +1,6 @@
 import { expect } from 'chai';
 
-describe('Green', function() {
+describe('Green', async () => {
   it('Expect green', function() {
     expect(true);
   });

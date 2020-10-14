@@ -16,9 +16,7 @@ export class CustomLogger extends Logger {
     this.logger = (message: any) => console.log(`${this.options.pre} ${message} ${this.options.post}`)
   }
 
-  start() {}
-
-  public track(trackProperties: any): void {
+  public async track(trackProperties: any): Promise<void> {
     if(this.logger && trackProperties) {
       const { message } = trackProperties;
       this.logger(message);
@@ -27,5 +25,9 @@ export class CustomLogger extends Logger {
   
   isDisabled() {
     return false;
+  }
+
+  dispose(){
+
   }
 }

@@ -4,11 +4,12 @@ import { Logger, AzureLogger, LoggerManager } from '../src/index';
 import { CustomLogger } from './CustomLogger';
 
 import { AzureConfiguration } from '../src/AzureLogger';
-import { defaultClient } from 'applicationinsights';
 
-describe('Logger manger', async () => {
-  afterEach(function () {
+describe('Logger manager', async () => {
+  let loggerManager: LoggerManager;
+  afterEach(async () => {
     sinon.restore();
+    loggerManager.dispose();
   });
   const configCustom: any = {
     pre: 'customLogger:',
@@ -16,19 +17,19 @@ describe('Logger manger', async () => {
   };
   const configAzure: AzureConfiguration = {
     aiCloudRole: 'aiCloudRole',
-    aiCloudRoleInstance: 'aiCloudRoleInstance',
+    aiCloudRoleInstance:  process.env.INSTANCE || 'aiCloudRoleInstance',
     disableAppInsights: false,
     environment: 'test',
     ikey: process.env.IKEY || 'ikey',
   }
 
   it('Should be created', async () => {
-    const loggerManager: LoggerManager = new LoggerManager();
+    loggerManager = new LoggerManager();
     expect(loggerManager).to.not.be.null;
   });
 
-  it('Should be add a Logger', async () => {
-    const loggerManager: LoggerManager = new LoggerManager();
+  it('Should add a Logger', async () => {
+     loggerManager = new LoggerManager();
     expect(loggerManager).to.not.be.null;
 
     const logger = new CustomLogger(configCustom);
@@ -36,11 +37,24 @@ describe('Logger manger', async () => {
 
     expect(logger).to.not.be.null;
     loggerManager.addLogger(loggerKey, logger);
-    expect(logger).to.deep.equal( loggerManager.getLogger(loggerKey))
+    expect(logger).to.deep.equal(loggerManager.getLogger(loggerKey))
   });
+  it('Should remove a Logger', async () => {
+    loggerManager = new LoggerManager();
+    expect(loggerManager).to.not.be.null;
 
+    const logger = new CustomLogger(configCustom);
+    const loggerKey = 'customLogger'
+
+    expect(logger).to.not.be.null;
+    loggerManager.addLogger(loggerKey, logger);
+    expect(logger).to.deep.equal(loggerManager.getLogger(loggerKey));
+
+    loggerManager.removeLogger(loggerKey);
+    expect(undefined).to.deep.equal(loggerManager.getLogger(loggerKey));
+ });
   it('Should start every logger', async () => {
-    const loggerManager: LoggerManager = new LoggerManager();
+    loggerManager = new LoggerManager();
     expect(loggerManager).to.not.be.null;
 
     const customLogger: CustomLogger  = new CustomLogger(configCustom);
@@ -52,20 +66,17 @@ describe('Logger manger', async () => {
     const azureLoggerKey = 'azure';
     loggerManager.addLogger(azureLoggerKey, azureLogger);
     expect(azureLogger).to.deep.equal(loggerManager.getLogger(azureLoggerKey));
-
-    loggerManager.start();
-
   });
 
   it('Should be track in every logger', async () => {
     const azureTrack = {
       name: 'age',
-      properties: { value: 28 }
+      properties: { value: Date() }
     }
     const customTrack = {
       message: 'Message',
     }
-    const loggerManager: LoggerManager = new LoggerManager();
+    loggerManager = new LoggerManager();
     expect(loggerManager).to.not.be.null;
 
     const customLogger: CustomLogger  = new CustomLogger(configCustom);
@@ -75,12 +86,12 @@ describe('Logger manger', async () => {
 
     const azureLogger: AzureLogger = new AzureLogger(configAzure);
     const fakeAzureTrackEvent = sinon.fake();
-    sinon.replace(azureLogger.logger, 'trackEvent', fakeAzureTrackEvent);
+    sinon.replace(azureLogger.logger.defaultClient, 'trackEvent', fakeAzureTrackEvent);
     const azureLoggerKey = 'azure';
     loggerManager.addLogger(azureLoggerKey, azureLogger);
     expect(azureLogger).to.deep.equal(loggerManager.getLogger(azureLoggerKey));
 
-    loggerManager.track({
+    await loggerManager.track({
       [azureLoggerKey]: {
         ...azureTrack,
         method: 'trackEvent'

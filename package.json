@@ -4,11 +4,11 @@
   "description": "DIDI SSI Logger",
   "main": "dist/index.js",
   "scripts": {
-    "test": "mocha -r ts-node/register/transpile-only -r source-map-support/register tests/**/*.test.ts",
+    "test": "mocha -r ts-node/register/transpile-only -r source-map-support/register --recursive ./tests/**/*.test.ts",
     "build": "tsc",
     "prepare": "npm run build",
     "prepublish": "tsc",
-    "coverage": "nyc -r text -e .ts -x \"*.test.ts\" npm run test"
+    "coverage": "nyc -r text -r lcov -e .ts npm run test"
   },
   "repository": {
     "type": "git",

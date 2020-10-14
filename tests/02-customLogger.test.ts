@@ -2,7 +2,7 @@ import { expect } from 'chai';
 import { Logger } from '../src/index';
 import { CustomLogger } from './CustomLogger';
 
-describe('Custom Logger', function() {  
+describe('Custom Logger', async () => {  
   const config: any = {
     pre: 'pre',
     post: 'post'
