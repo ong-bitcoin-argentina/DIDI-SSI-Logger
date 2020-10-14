@@ -1,13 +1,12 @@
 {
   "name": "@proyecto-didi/didi-ssi-logger",
-  "version": "0.0.4",
+  "version": "0.0.5",
   "description": "DIDI SSI Logger",
   "main": "dist/index.js",
   "scripts": {
     "test": "mocha -r ts-node/register/transpile-only -r source-map-support/register --recursive ./tests/**/*.test.ts",
-    "build": "tsc",
+    "build": "rm -rf dist && tsc",
     "prepare": "npm run build",
-    "prepublish": "tsc",
     "coverage": "nyc -r text -r lcov -e .ts npm run test"
   },
   "repository": {
