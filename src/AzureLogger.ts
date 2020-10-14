@@ -1,4 +1,3 @@
-import { setup, start, defaultClient, TelemetryClient } from 'applicationinsights';
 import { Logger } from './Logger';
 
 export interface AzureConfiguration {
@@ -16,55 +15,59 @@ export interface AzureTrackProperties {
 }
 
 export class AzureLogger extends Logger {
-  options: AzureConfiguration;
+  options: AzureConfiguration | null = null;
   logger: any = null;
 
   constructor(config : AzureConfiguration) {
     super();
+    if(config.disableAppInsights) return;
+    
     this.options = config;
-    if(!config.disableAppInsights) {
-      this.config();
-    }
+    this.config();
   }
 
-  protected config() {
-    const { ikey, environment, disableAppInsights, aiCloudRole, aiCloudRoleInstance } = this.options;
+  protected async config() {
+    const { ikey, environment, disableAppInsights, aiCloudRole, aiCloudRoleInstance } = this.options!;
+    // @ts-ignore 
+    const applicationinsights = require('applicationinsights');
+    applicationinsights.setup(ikey)
+      .setAutoDependencyCorrelation(true)
+      .setAutoCollectConsole(true)
+      .setAutoCollectPerformance(true, true)
+      .setAutoCollectExceptions(true)
+      .setUseDiskRetryCaching(true)
+      .setSendLiveMetrics(true)
+      .start();      
 
-    setup(ikey)
-    .setAutoDependencyCorrelation(true)
-    .setAutoCollectPerformance(true, true)
-    .setAutoCollectExceptions(true)
-    .setUseDiskRetryCaching(true)
-    .setSendLiveMetrics(true)
-
-    defaultClient!.commonProperties = {
+    applicationinsights.defaultClient!.commonProperties = {
       environment,
     };
 
-    defaultClient!.config.disableAppInsights = disableAppInsights;
+    applicationinsights.defaultClient!.config.disableAppInsights = disableAppInsights;
 
-    defaultClient!.context.tags["ai.cloud.role"] =  aiCloudRole;
-    defaultClient!.context.tags["ai.cloud.roleInstance"] = aiCloudRoleInstance;
+    applicationinsights.defaultClient!.context.tags["ai.cloud.role"] =  aiCloudRole;
+    applicationinsights.defaultClient!.context.tags["ai.cloud.roleInstance"] = aiCloudRoleInstance;
 
-    this.logger = defaultClient;
+    this.logger = applicationinsights;
   }
 
-  start() {
-    if(!this.options.disableAppInsights) {
-      start();
-    }
-  }
+  public async track(trackProperties: AzureTrackProperties): Promise<void> {
+    if ( !this.logger || !this.options ||this.options.disableAppInsights || !trackProperties) return;
 
-  public track(trackProperties: AzureTrackProperties): void {
-    if ( this.logger
-      && !this.options.disableAppInsights
-      && trackProperties) {
-        const { name, method, properties } = trackProperties;
-        this.logger[method]({ name, properties });
-    }
+    const { name, method, properties } = trackProperties;
+    this.logger.defaultClient[method]({ name, properties });
+    
   }
 
   isDisabled() {
+    if (!this.options) return false;
     return this.options.disableAppInsights;
+  }
+
+  dispose() {
+    if (!this.logger) return;
+    if (this.logger.defaultClient) this.logger.defaultClient.flush();
+      
+    this.logger.dispose();
   }
 }

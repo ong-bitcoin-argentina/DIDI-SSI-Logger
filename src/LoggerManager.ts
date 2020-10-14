@@ -1,4 +1,3 @@
-
 import { Logger } from "./Logger";
 
 export class LoggerManager {
@@ -18,19 +17,20 @@ export class LoggerManager {
     return this.loggers[key];
   }
 
-  async track(loggerProperties: any) {
+  async track(loggerProperties: any): Promise<void> {
     for (let loggerKey in this.loggers) {
       const params =  loggerProperties[loggerKey];
       const loggerInstance = this.loggers[loggerKey];
-      setImmediate(() => loggerInstance.track(params));
+      // @ts-ignore 
+      setImmediate(async () => await loggerInstance.track(params));
     }
   }
 
-  async start(loggerProperties: any = {}) {
+  dispose() {
     for (let loggerKey in this.loggers) {
-      const params =  loggerProperties[loggerKey];
       const loggerInstance = this.loggers[loggerKey];
-      setImmediate(() => loggerInstance.start(params));
+      // @ts-ignore 
+      setImmediate(() => loggerInstance.dispose());
     }
   }
 }
