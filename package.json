@@ -24,8 +24,8 @@
     "dist"
   ],
   "dependencies": {
-    "applicationinsights": "^2.0.0-beta.201004.0",
-    "applicationinsights-native-metrics": "0.0.5"
+    "applicationinsights": "2.0.0",
+    "applicationinsights-native-metrics": "0.0.6"
   },
   "devDependencies": {
     "@istanbuljs/nyc-config-typescript": "^1.0.1",
